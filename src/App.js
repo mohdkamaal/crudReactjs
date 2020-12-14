@@ -1,26 +1,25 @@
 import React, { Component } from "react";
 
-class App extends React.Component {
+class App extends Component {
   constructor() {
     super();
-    state = {
+    this.state = {
       store: [],
-    }
+    };
+  }
 
-  };
-
-  setState({
-
-  })
-
+  componentDidMount() {
+    this.setState({
+      store: this.data,
+    });
+  }
 
   render() {
     return (
       <div>
-
-    </div>
-  )
-}
-
+        <h1>hello crud</h1>
+      </div>
+    );
+  }
 }
 export default App;
