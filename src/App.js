@@ -1,61 +1,85 @@
 import React, { Component } from "react";
 
 class App extends Component {
+  debugger;
   constructor(props) {
     super(props);
     this.state = {
       data: [],
-      editMode: false,
+      edit: false,
+      index: "",
+      act: 0,
     };
   }
 
-  submitBtn = (event) => {
+  submitBtn = (e) => {
+    e.preventDefault();
+    let data = this.state.data;
     const name = this.name.value;
     const phone = this.phone.value;
     const email = this.email.value;
+
+    if (this.state.act === 0) {
+      //new
+      let data = {
+        name,
+        phone,
+        email,
+      };
+      data.push(data);
+    } else {
+      //update
+      let index = this.state.index;
+      data[index].name = name;
+      data[index].phone = phone;
+      data[index].email = phone;
+    }
+
+    this.setState({
+      data: data,
+      act: 0,
+    });
+
+    this.myForm.reset();
+    this.name.focus();
+
     let isValid = true;
 
-    if (!email === this.state.update) {
-      this.updateItem();
-    } else {
-      if (!this.name.value) {
+    if (!this.name.value) {
+      isValid = false;
+
+      alert("Please enter your name.");
+    } else isValid = true;
+
+    if (!this.phone.value) {
+      isValid = false;
+      alert("please enter phone number");
+    } else isValid = true;
+
+    if (!this.email.value) {
+      isValid = false;
+
+      alert("Please enter your email Address.");
+    } else isValid = true;
+
+    if (typeof this.email.value !== "undefined") {
+      var pattern = new RegExp(
+        /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
+      );
+
+      if (!pattern.test(this.email.value)) {
         isValid = false;
 
-        alert("Please enter your name.");
+        alert("Please enter valid email address.");
       } else isValid = true;
-
-      if (!this.phone.value) {
-        isValid = false;
-        alert("please enter phone number");
-      } else isValid = true;
-
-      if (!this.email.value) {
-        isValid = false;
-
-        alert("Please enter your email Address.");
-      } else isValid = true;
-
-      if (typeof this.email.value !== "undefined") {
-        var pattern = new RegExp(
-          /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
-        );
-
-        if (!pattern.test(this.email.value)) {
-          isValid = false;
-
-          alert("Please enter valid email address.");
-        } else isValid = true;
-      }
-
-      if (isValid) {
-        const info = { name: name, phone: phone, email: email };
-        const data = this.state.data;
-        data.push(info);
-        this.setState({ data: data });
-        event.preventDefault();
-        event.target.reset();
-      }
     }
+
+    if (isValid) {
+      const info = { name: name, phone: phone, email: email };
+      data.push(info);
+      this.setState({ data: data });
+    }
+
     return isValid;
   };
 
@@ -68,29 +92,16 @@ class App extends Component {
     this.setState({ data: data });
   };
 
-  editItem = (store) => {
-    this.name.value = store.name;
-    this.phone.value = store.phone;
-    this.email.value = store.email;
-    this.setState({ editMode: true });
-  };
-  // {
-  //   [edit.target.name] = edit.target.value;
-  //   this.setState({ input });
-  // };
+  editItem = (i) => {
+    let data = this.state.data[i];
+    this.name.value = data.name;
+    this.phone.value = data.phone;
+    this.email.value = data.email;
+    this.setState({ act: 1, index: i });
 
-  updateItem = (email) => {
-    debugger;
-    const elementsIndex = this.state.data.findIndex(
-      (element) => element.email === email
-    );
-    const newArray = [this.state.data];
-    newArray[elementsIndex] = {
-      ...newArray[elementsIndex],
-      completed: !newArray[elementsIndex].completed,
-    };
-    this.setState({ data: newArray });
+    this.name.focus();
   };
+
   render() {
     const Card = (props) => (
       <div className="col-md-6 col-lg-3">
@@ -111,13 +122,13 @@ class App extends Component {
 
             <button
               className="btn btn-success btn-sm"
-              onClick={() => this.editItem(props.info)}
+              onClick={() => this.editItem(i)}
             >
               Edit
             </button>
             <button
               className="btn btn-outline-danger btn-sm"
-              onClick={() => this.deleteItem(props.deleteMail)}
+              onClick={() => this.deleteItem(i)}
             >
               Delete
             </button>
@@ -165,12 +176,12 @@ class App extends Component {
         <hr />
         <h6>Your data cards are showing below:</h6>
         <div className="row">
-          {this.state.data.map((info, index) => (
+          {this.state.data.map((data, i) => (
             <Card
-              key={index}
-              info={info}
+              key={i}
               idCard={index}
               deleteMail={info.email}
+              {...data.name}
             />
           ))}
         </div>
