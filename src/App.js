@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 class App extends Component {
-  debugger;
   constructor(props) {
     super(props);
     this.state = {
@@ -13,54 +12,31 @@ class App extends Component {
   }
 
   submitBtn = (e) => {
+    debugger;
     e.preventDefault();
     let data = this.state.data;
     const name = this.name.value;
     const phone = this.phone.value;
     const email = this.email.value;
 
-    if (this.state.act === 0) {
-      //new
-      let data = {
-        name,
-        phone,
-        email,
-      };
-      data.push(data);
-    } else {
-      //update
-      let index = this.state.index;
-      data[index].name = name;
-      data[index].phone = phone;
-      data[index].email = phone;
-    }
-
-    this.setState({
-      data: data,
-      act: 0,
-    });
-
-    this.myForm.reset();
-    this.name.focus();
+    // if statement for submit or update
 
     let isValid = true;
-
+    // if- statement fot valid fieldss
     if (!this.name.value) {
       isValid = false;
-
       alert("Please enter your name.");
-    } else isValid = true;
+    }
 
     if (!this.phone.value) {
       isValid = false;
       alert("please enter phone number");
-    } else isValid = true;
+    }
 
     if (!this.email.value) {
       isValid = false;
-
       alert("Please enter your email Address.");
-    } else isValid = true;
+    }
 
     if (typeof this.email.value !== "undefined") {
       var pattern = new RegExp(
@@ -69,34 +45,48 @@ class App extends Component {
 
       if (!pattern.test(this.email.value)) {
         isValid = false;
-
         alert("Please enter valid email address.");
-      } else isValid = true;
+      }
     }
 
     if (isValid) {
-      const info = { name: name, phone: phone, email: email };
-      data.push(info);
-      this.setState({ data: data });
+      if (this.state.act === 0) {
+        const info = { name: name, phone: phone, email: email };
+        data.push(info);
+      } else {
+        //update
+        let index = this.state.index;
+        data[index].name = name;
+        data[index].phone = phone;
+        data[index].email = email;
+      }
+
+      this.setState({
+        data: data,
+        act: 0,
+      });
+      this.myForm.reset();
     }
 
-    return isValid;
+    // this.name.focus();
   };
 
   deleteItem = (x) => {
-    var data = this.state.data;
-    data.splice(
-      data.findIndex((xyz) => xyz.email === x),
+    debugger;
+    var del = this.state.data;
+    del.splice(
+      del.findIndex((xyz) => xyz.email === x),
       1
     );
-    this.setState({ data: data });
+    this.setState({ data: del });
   };
 
   editItem = (i) => {
-    let data = this.state.data[i];
-    this.name.value = data.name;
-    this.phone.value = data.phone;
-    this.email.value = data.email;
+    debugger;
+    let currentItem = this.state.data[i];
+    this.name.value = currentItem.name;
+    this.phone.value = currentItem.phone;
+    this.email.value = currentItem.email;
     this.setState({ act: 1, index: i });
 
     this.name.focus();
@@ -109,26 +99,26 @@ class App extends Component {
           <div className="card-body">
             <p className="card-title">
               <span>Name: </span>
-              {props.info.name}
+              {props.detail.name}
             </p>
             <p className="card-text">
               <span>Phone: </span>
-              {props.info.phone}
+              {props.detail.phone}
             </p>
             <p className="card-text">
               <span>Email: </span>
-              {props.info.email}
+              {props.detail.email}
             </p>
 
             <button
               className="btn btn-success btn-sm"
-              onClick={() => this.editItem(i)}
+              onClick={() => this.editItem(props.indexData)}
             >
               Edit
             </button>
             <button
               className="btn btn-outline-danger btn-sm"
-              onClick={() => this.deleteItem(i)}
+              onClick={() => this.deleteItem(props.detail.email)}
             >
               Delete
             </button>
@@ -142,7 +132,11 @@ class App extends Component {
         <h1>CRUD with React</h1>
         <hr />
         <div className="row">
-          <form className="form-inline" onSubmit={this.submitBtn}>
+          <form
+            ref={(form) => (this.myForm = form)}
+            className="form-inline"
+            onSubmit={this.submitBtn}
+          >
             <input
               type="text"
               className="form-control mb-2 mr-sm-2 mb-sm-0"
@@ -177,12 +171,7 @@ class App extends Component {
         <h6>Your data cards are showing below:</h6>
         <div className="row">
           {this.state.data.map((data, i) => (
-            <Card
-              key={i}
-              idCard={index}
-              deleteMail={info.email}
-              {...data.name}
-            />
+            <Card key={i} indexData={i} detail={data} />
           ))}
         </div>
       </div>
