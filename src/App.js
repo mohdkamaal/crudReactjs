@@ -8,6 +8,7 @@ class App extends Component {
       edit: false,
       index: "",
       act: 0,
+      itemsToDelete: [],
     };
   }
 
@@ -72,7 +73,6 @@ class App extends Component {
   };
 
   deleteItem = (x) => {
-    debugger;
     var del = this.state.data;
     del.splice(
       del.findIndex((xyz) => xyz.email === x),
@@ -92,11 +92,37 @@ class App extends Component {
     this.name.focus();
   };
 
+  multipleDelete = (email) => {
+    let currentItems = this.state.itemsToDelete;
+    if (currentItems.indexOf(email) > -1) {
+      currentItems = currentItems.filter((x) => x != email);
+    } else {
+      currentItems.push(email);
+    }
+
+    this.setState({ itemsToDelete: currentItems });
+  };
+
+  buttonToMultiDelete = () => {
+    debugger;
+    let deleteChecked = this.state.itemsToDelete;
+    deleteChecked.splice(0, deleteChecked.length);
+    this.setState({ data: deleteChecked });
+  };
+
   render() {
     const Card = (props) => (
       <div className="col-md-6 col-lg-3">
         <div className="card mb-3">
           <div className="card-body">
+            <input
+              type="checkbox"
+              aria-label="Checkbox for following text input"
+              onClick={() => this.multipleDelete(props.detail.email)}
+              checked={
+                this.state.itemsToDelete.indexOf(props.detail.email) > -1
+              }
+            ></input>
             <p className="card-title">
               <span>Name: </span>
               {props.detail.name}
@@ -165,6 +191,16 @@ class App extends Component {
             <button type="submit" className="btn btn-primary">
               Submit
             </button>
+
+            {this.state.itemsToDelete.length > 0 && (
+              <button
+                type="button"
+                class="btn btn-danger"
+                onClick={() => this.buttonToMultiDelete()}
+              >
+                Delete All
+              </button>
+            )}
           </form>
         </div>
         <hr />
